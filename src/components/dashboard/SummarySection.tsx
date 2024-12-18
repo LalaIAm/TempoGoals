@@ -1,54 +1,30 @@
 import React from "react";
 import CompletionRate from "./summary/CompletionRate";
 import DeadlinesList from "./summary/DeadlinesList";
+import { useDeadlines } from "@/hooks/useDeadlines";
+import { Database } from "@/types/supabase";
+
+type Goal = Database["public"]["Tables"]["goals"]["Row"] & {
+  milestones: Database["public"]["Tables"]["milestones"]["Row"][];
+};
 
 interface SummarySectionProps {
-  completionData?: {
-    totalGoals: number;
-    completedGoals: number;
-    rate: number;
-    trend: number;
-  };
-  deadlines?: Array<{
-    id: string;
-    title: string;
-    dueDate: string;
-    priority: "high" | "medium" | "low";
-    daysRemaining: number;
-  }>;
+  goals?: Goal[];
 }
 
-const SummarySection = ({
-  completionData = {
-    totalGoals: 10,
-    completedGoals: 7,
-    rate: 70,
-    trend: 5,
-  },
-  deadlines = [
-    {
-      id: "1",
-      title: "Complete Project Documentation",
-      dueDate: "2024-06-30",
-      priority: "high",
-      daysRemaining: 5,
-    },
-    {
-      id: "2",
-      title: "Review Q2 Goals",
-      dueDate: "2024-07-15",
-      priority: "medium",
-      daysRemaining: 12,
-    },
-    {
-      id: "3",
-      title: "Update Team Progress",
-      dueDate: "2024-07-01",
-      priority: "low",
-      daysRemaining: 7,
-    },
-  ],
-}: SummarySectionProps) => {
+const SummarySection = ({ goals = [] }: SummarySectionProps) => {
+  const { deadlines } = useDeadlines(goals);
+
+  const completionData = {
+    totalGoals: goals.length,
+    completedGoals: goals.filter((goal) => goal.progress === 100).length,
+    rate: goals.length
+      ? (goals.filter((goal) => goal.progress === 100).length / goals.length) *
+        100
+      : 0,
+    trend: 0, // You would calculate this based on historical data
+  };
+
   return (
     <div className="w-full h-[150px] p-6 bg-background">
       <div className="flex items-start justify-between gap-6">

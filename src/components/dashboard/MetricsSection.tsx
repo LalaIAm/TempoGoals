@@ -1,48 +1,17 @@
 import React from "react";
 import MetricCard from "./metrics/MetricCard";
+import { useMetrics } from "@/hooks/useMetrics";
+import { Database } from "@/types/supabase";
+
+type Goal = Database["public"]["Tables"]["goals"]["Row"];
 
 interface MetricsSectionProps {
-  metrics?: Array<{
-    title: string;
-    value: string | number;
-    change: number;
-    progress: number;
-    description: string;
-  }>;
+  goals?: Goal[];
 }
 
-const MetricsSection = ({
-  metrics = [
-    {
-      title: "Goals Completed",
-      value: 12,
-      change: 8,
-      progress: 75,
-      description: "Total goals completed this month",
-    },
-    {
-      title: "In Progress",
-      value: 5,
-      change: -2,
-      progress: 45,
-      description: "Goals currently in progress",
-    },
-    {
-      title: "Success Rate",
-      value: "85%",
-      change: 5,
-      progress: 85,
-      description: "Overall goal completion rate",
-    },
-    {
-      title: "Time to Complete",
-      value: "4.2 days",
-      change: -1,
-      progress: 65,
-      description: "Average time to complete goals",
-    },
-  ],
-}: MetricsSectionProps) => {
+const MetricsSection = ({ goals = [] }: MetricsSectionProps) => {
+  const { metrics } = useMetrics(goals);
+
   return (
     <div className="w-full h-[200px] p-6 bg-background">
       <div className="flex items-center justify-between gap-6 overflow-x-auto">
