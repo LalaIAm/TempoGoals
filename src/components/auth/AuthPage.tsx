@@ -5,42 +5,57 @@ import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
 import EmailVerification from "./EmailVerification";
 import { UserPlus, LogIn } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
-interface AuthPageProps {
-  onLogin?: (values: any) => Promise<void>;
-  onSignup?: (values: any) => Promise<void>;
-  onResendVerification?: () => Promise<void>;
-  isLoading?: boolean;
-  verificationEmail?: string;
-  verificationProgress?: number;
-  isVerified?: boolean;
-}
-
-const AuthPage = ({
-  onLogin = async () => {},
-  onSignup = async () => {},
-  onResendVerification = async () => {},
-  isLoading = false,
-  verificationEmail = "",
-  verificationProgress = 0,
-  isVerified = false,
-}: AuthPageProps) => {
+const AuthPage = () => {
+  const { login, signup, resendVerificationEmail, loading } = useAuth();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+
+  const handleLogin = async (values: any) => {
+    setIsLoggingIn(true);
+    try {
+      await login(values.email, values.password);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
 
   const handleSignup = async (values: any) => {
-    await onSignup(values);
-    setShowVerification(true);
+    setIsSigningUp(true);
+    try {
+      await signup(values.email, values.password);
+      setVerificationEmail(values.email);
+      setShowVerification(true);
+    } finally {
+      setIsSigningUp(false);
+    }
   };
+
+  const handleResendVerification = async () => {
+    if (verificationEmail) {
+      await resendVerificationEmail(verificationEmail);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center gap-4 bg-background">
+        <LoadingSpinner size="lg" />
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   if (showVerification) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
         <EmailVerification
           email={verificationEmail}
-          isVerified={isVerified}
-          isLoading={isLoading}
-          progress={verificationProgress}
-          onResendEmail={onResendVerification}
+          onResendEmail={handleResendVerification}
         />
       </div>
     );
@@ -66,11 +81,11 @@ const AuthPage = ({
             </TabsList>
 
             <TabsContent value="login" className="mt-6">
-              <LoginForm onSubmit={onLogin} isLoading={isLoading} />
+              <LoginForm onSubmit={handleLogin} isLoading={isLoggingIn} />
             </TabsContent>
 
             <TabsContent value="signup" className="mt-6">
-              <SignupForm onSubmit={handleSignup} isLoading={isLoading} />
+              <SignupForm onSubmit={handleSignup} isLoading={isSigningUp} />
             </TabsContent>
           </Tabs>
         </CardContent>
