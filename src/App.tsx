@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { useRoutes, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./components/home";
 import AuthPage from "./components/auth/AuthPage";
 import ProfilePage from "./components/profile/ProfilePage";
@@ -9,23 +9,22 @@ import EmailVerification from "./components/auth/EmailVerification";
 import PasswordReset from "./components/auth/PasswordReset";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
-import routes from "tempo-routes";
+import GoalCoach from "./components/ai-coach/GoalCoach";
 
 function App() {
   return (
-    <AuthProvider>
-      <Suspense fallback={<p>Loading...</p>}>
-        <>
+    <div className="min-h-screen bg-background">
+      <AuthProvider>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center min-h-screen">
+              <p>Loading...</p>
+            </div>
+          }
+        >
           <Routes>
             {/* Auth Routes */}
-            <Route
-              path="/auth"
-              element={
-                <AuthGuard>
-                  <AuthPage />
-                </AuthGuard>
-              }
-            />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/auth/verify" element={<EmailVerification />} />
             <Route path="/auth/reset-password" element={<PasswordReset />} />
 
@@ -35,6 +34,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/goals"
+              element={
+                <ProtectedRoute>
+                  <GoalCoach />
                 </ProtectedRoute>
               }
             />
@@ -50,11 +57,10 @@ function App() {
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
           <Toaster />
-        </>
-      </Suspense>
-    </AuthProvider>
+        </Suspense>
+      </AuthProvider>
+    </div>
   );
 }
 
