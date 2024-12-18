@@ -6,47 +6,56 @@ import ProfileForm from "./ProfileForm";
 import PasswordChangeForm from "./PasswordChangeForm";
 import AvatarUpload from "./AvatarUpload";
 import { UserCircle, Lock } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
-interface ProfilePageProps {
-  userData?: {
-    name: string;
-    email: string;
-    location: string;
-    phone: string;
-    occupation: string;
-    bio: string;
-    avatarUrl: string;
-  };
-  onUpdateProfile?: (values: any) => Promise<void>;
-  onUpdatePassword?: (values: any) => Promise<void>;
-  onUpdateAvatar?: (file: File) => Promise<void>;
-  isLoading?: boolean;
-}
-
-const ProfilePage = ({
-  userData = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    location: "San Francisco, CA",
-    phone: "+1 234 567 8900",
-    occupation: "Software Engineer",
-    bio: "Passionate about building great software and solving complex problems.",
-    avatarUrl: "https://dummyimage.com/200/cccccc/666666&text=JD",
-  },
-  onUpdateProfile = async () => {},
-  onUpdatePassword = async () => {},
-  onUpdateAvatar = async () => {},
-  isLoading = false,
-}: ProfilePageProps) => {
+const ProfilePage = () => {
+  const { user } = useAuth();
+  const { profile, isUpdating, updateProfile } = useProfile();
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  const handleUpdateProfile = async (values: any) => {
+    try {
+      await updateProfile(values);
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Update failed",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdatePassword = async (values: any) => {
+    try {
+      // Password update is handled by AuthContext
+      await updatePassword(values.newPassword);
+      toast({
+        title: "Success",
+        description: "Password updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Update failed",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="w-full max-w-[800px] mx-auto p-6 space-y-6 bg-background">
       <ProfileHeader
-        name={userData.name}
-        email={userData.email}
-        location={userData.location}
-        avatarUrl={userData.avatarUrl}
+        name={profile?.full_name || user?.email || ""}
+        email={user?.email || ""}
+        location={profile?.location || ""}
+        avatarUrl={profile?.avatar_url || ""}
         onEditAvatar={() => setIsAvatarDialogOpen(true)}
       />
 
@@ -65,23 +74,23 @@ const ProfilePage = ({
             <TabsContent value="profile" className="mt-6">
               <ProfileForm
                 defaultValues={{
-                  fullName: userData.name,
-                  email: userData.email,
-                  phone: userData.phone,
-                  location: userData.location,
-                  occupation: userData.occupation,
-                  bio: userData.bio,
+                  fullName: profile?.full_name || "",
+                  email: user?.email || "",
+                  phone: profile?.phone || "",
+                  location: profile?.location || "",
+                  occupation: profile?.occupation || "",
+                  bio: profile?.bio || "",
                 }}
-                onSubmit={onUpdateProfile}
-                isLoading={isLoading}
+                onSubmit={handleUpdateProfile}
+                isLoading={isUpdating}
               />
             </TabsContent>
 
             <TabsContent value="security" className="mt-6">
               <div className="flex justify-center">
                 <PasswordChangeForm
-                  onSubmit={onUpdatePassword}
-                  isLoading={isLoading}
+                  onSubmit={handleUpdatePassword}
+                  isLoading={isUpdating}
                 />
               </div>
             </TabsContent>
@@ -90,9 +99,8 @@ const ProfilePage = ({
       </Card>
 
       <AvatarUpload
-        currentAvatar={userData.avatarUrl}
-        name={userData.name}
-        onUpload={onUpdateAvatar}
+        currentAvatar={profile?.avatar_url || ""}
+        name={profile?.full_name || user?.email || ""}
         isOpen={isAvatarDialogOpen}
         onOpenChange={setIsAvatarDialogOpen}
       />

@@ -4,132 +4,175 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[]
+  | Json[];
 
 export type Database = {
   public: {
     Tables: {
+      user_profiles: {
+        Row: {
+          id: string;
+          full_name: string | null;
+          phone: string | null;
+          location: string | null;
+          occupation: string | null;
+          bio: string | null;
+          avatar_url: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          full_name?: string | null;
+          phone?: string | null;
+          location?: string | null;
+          occupation?: string | null;
+          bio?: string | null;
+          avatar_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          full_name?: string | null;
+          phone?: string | null;
+          location?: string | null;
+          occupation?: string | null;
+          bio?: string | null;
+          avatar_url?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_id_fkey";
+            columns: ["id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       goal_history: {
         Row: {
-          action: string
-          created_at: string | null
-          goal_id: string | null
-          id: string
-          progress: number
-        }
+          action: string;
+          created_at: string | null;
+          goal_id: string | null;
+          id: string;
+          progress: number;
+        };
         Insert: {
-          action: string
-          created_at?: string | null
-          goal_id?: string | null
-          id?: string
-          progress: number
-        }
+          action: string;
+          created_at?: string | null;
+          goal_id?: string | null;
+          id?: string;
+          progress: number;
+        };
         Update: {
-          action?: string
-          created_at?: string | null
-          goal_id?: string | null
-          id?: string
-          progress?: number
-        }
+          action?: string;
+          created_at?: string | null;
+          goal_id?: string | null;
+          id?: string;
+          progress?: number;
+        };
         Relationships: [
           {
-            foreignKeyName: "goal_history_goal_id_fkey"
-            columns: ["goal_id"]
-            isOneToOne: false
-            referencedRelation: "goals"
-            referencedColumns: ["id"]
+            foreignKeyName: "goal_history_goal_id_fkey";
+            columns: ["goal_id"];
+            isOneToOne: false;
+            referencedRelation: "goals";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       goals: {
         Row: {
-          category: Database["public"]["Enums"]["goal_category"]
-          created_at: string | null
-          description: string | null
-          due_date: string
-          id: string
-          priority: Database["public"]["Enums"]["priority_level"]
-          progress: number
-          title: string
-          updated_at: string | null
-        }
+          category: Database["public"]["Enums"]["goal_category"];
+          created_at: string | null;
+          description: string | null;
+          due_date: string;
+          id: string;
+          priority: Database["public"]["Enums"]["priority_level"];
+          progress: number;
+          title: string;
+          updated_at: string | null;
+        };
         Insert: {
-          category: Database["public"]["Enums"]["goal_category"]
-          created_at?: string | null
-          description?: string | null
-          due_date: string
-          id?: string
-          priority?: Database["public"]["Enums"]["priority_level"]
-          progress?: number
-          title: string
-          updated_at?: string | null
-        }
+          category: Database["public"]["Enums"]["goal_category"];
+          created_at?: string | null;
+          description?: string | null;
+          due_date: string;
+          id?: string;
+          priority?: Database["public"]["Enums"]["priority_level"];
+          progress?: number;
+          title: string;
+          updated_at?: string | null;
+        };
         Update: {
-          category?: Database["public"]["Enums"]["goal_category"]
-          created_at?: string | null
-          description?: string | null
-          due_date?: string
-          id?: string
-          priority?: Database["public"]["Enums"]["priority_level"]
-          progress?: number
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+          category?: Database["public"]["Enums"]["goal_category"];
+          created_at?: string | null;
+          description?: string | null;
+          due_date?: string;
+          id?: string;
+          priority?: Database["public"]["Enums"]["priority_level"];
+          progress?: number;
+          title?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       milestones: {
         Row: {
-          completed: boolean | null
-          created_at: string | null
-          due_date: string
-          goal_id: string | null
-          id: string
-          title: string
-        }
+          completed: boolean | null;
+          created_at: string | null;
+          due_date: string;
+          goal_id: string | null;
+          id: string;
+          title: string;
+        };
         Insert: {
-          completed?: boolean | null
-          created_at?: string | null
-          due_date: string
-          goal_id?: string | null
-          id?: string
-          title: string
-        }
+          completed?: boolean | null;
+          created_at?: string | null;
+          due_date: string;
+          goal_id?: string | null;
+          id?: string;
+          title: string;
+        };
         Update: {
-          completed?: boolean | null
-          created_at?: string | null
-          due_date?: string
-          goal_id?: string | null
-          id?: string
-          title?: string
-        }
+          completed?: boolean | null;
+          created_at?: string | null;
+          due_date?: string;
+          goal_id?: string | null;
+          id?: string;
+          title?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "milestones_goal_id_fkey"
-            columns: ["goal_id"]
-            isOneToOne: false
-            referencedRelation: "goals"
-            referencedColumns: ["id"]
+            foreignKeyName: "milestones_goal_id_fkey";
+            columns: ["goal_id"];
+            isOneToOne: false;
+            referencedRelation: "goals";
+            referencedColumns: ["id"];
           },
-        ]
-      }
-    }
+        ];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Enums: {
-      goal_category: "personal" | "work" | "health"
-      priority_level: "high" | "medium" | "low"
-    }
+      goal_category: "personal" | "work" | "health";
+      priority_level: "high" | "medium" | "low";
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type PublicSchema = Database[Extract<keyof Database, "public">];
 
 export type Tables<
   PublicTableNameOrOptions extends
@@ -142,7 +185,7 @@ export type Tables<
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
@@ -150,11 +193,11 @@ export type Tables<
         PublicSchema["Views"])
     ? (PublicSchema["Tables"] &
         PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-        Row: infer R
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
@@ -165,17 +208,17 @@ export type TablesInsert<
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
@@ -186,17 +229,17 @@ export type TablesUpdate<
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   PublicEnumNameOrOptions extends
@@ -209,19 +252,4 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
-    : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
-    | { schema: keyof Database },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
-  }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;

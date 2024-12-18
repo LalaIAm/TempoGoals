@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera, Upload, X } from "lucide-react";
@@ -9,11 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAvatar } from "@/hooks/useAvatar";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AvatarUploadProps {
   currentAvatar?: string;
   name?: string;
-  onUpload?: (file: File) => Promise<void>;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -21,13 +22,13 @@ interface AvatarUploadProps {
 const AvatarUpload = ({
   currentAvatar = "https://dummyimage.com/200/cccccc/666666&text=Avatar",
   name = "User",
-  onUpload = async () => {},
   isOpen = true,
   onOpenChange = () => {},
 }: AvatarUploadProps) => {
   const [previewUrl, setPreviewUrl] = useState<string>(currentAvatar);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const { uploadAvatar, deleteAvatar, isUploading, error } = useAvatar();
+  const { toast } = useToast();
 
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,18 +48,38 @@ const AvatarUpload = ({
   const handleUpload = async () => {
     if (!selectedFile) return;
 
-    setIsUploading(true);
     try {
-      await onUpload(selectedFile);
+      await uploadAvatar(selectedFile);
       onOpenChange(false);
+      toast({
+        title: "Success",
+        description: "Profile picture updated successfully",
+      });
     } catch (error) {
-      console.error("Error uploading avatar:", error);
-    } finally {
-      setIsUploading(false);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Upload failed",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    if (currentAvatar && currentAvatar !== previewUrl) {
+      try {
+        await deleteAvatar(currentAvatar);
+        toast({
+          title: "Success",
+          description: "Profile picture removed successfully",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Delete failed",
+          variant: "destructive",
+        });
+      }
+    }
     setPreviewUrl(currentAvatar);
     setSelectedFile(null);
   };
@@ -110,6 +131,7 @@ const AvatarUpload = ({
                       accept="image/*"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       onChange={handleFileSelect}
+                      disabled={isUploading}
                     />
                     <Button variant="outline" className="w-full">
                       <Upload className="mr-2 h-4 w-4" />
@@ -120,6 +142,12 @@ const AvatarUpload = ({
               </CardContent>
             </Card>
           </div>
+
+          {error && (
+            <p className="text-sm text-destructive text-center">
+              {error.message}
+            </p>
+          )}
 
           <div className="flex justify-end gap-4">
             <Button
